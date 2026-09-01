@@ -54,19 +54,24 @@ static void start_new_game(void) {
 
 static void enter_title(void) {
     state = STATE_TITLE;
+    skip  = 10;
     state_tmr = 0;
     clear_all_sprites();
     draw_title();
+    anim_title();   /* same reason as enter_level: the debounce frames return
+                     * before run_title() draws, so seed the chase sprites */
 }
 
 static void enter_scores(void) {
     state = STATE_SCORES;
+    skip  = 10;
     state_tmr = 200;
     draw_scores();
 }
 
 static void enter_level(void) {
     state = STATE_GAME;
+    skip  = 10;
     clear_all_sprites();
     init_level();
     apply_theme(level);
@@ -75,17 +80,24 @@ static void enter_level(void) {
     init_hud();
     draw_hud();
     start_bees();
+    /* The skip frames below return before run_game() draws, so put the
+     * actors on screen once here - otherwise the field sits empty for the
+     * length of the debounce. */
+    draw_player();
+    draw_bees();
     PlaySound(SND_START);
 }
 
 static void enter_dead(void) {
     state = STATE_DEAD;
+    skip  = 6;
     state_tmr = 90;
     PlaySound(SND_DIE);
 }
 
 static void enter_clear(void) {
     state = STATE_CLEAR;
+    skip  = 6;
     state_tmr = 120;
     /* time bonus: what's left of the sudden-death clock */
     if (level_frames < SUDDEN_AT)
@@ -95,7 +107,9 @@ static void enter_clear(void) {
 }
 
 static void enter_over(void) {
+    hide_player();
     state = STATE_OVER;
+    skip  = 10;
     state_tmr = 150;
     show_banner(s_gameover);
     if (is_high_score(score)) {
@@ -172,6 +186,8 @@ static void run_dead(void) {
     if (state_tmr > 0) state_tmr = state_tmr - 1;
     if (state_tmr > 0) return;
 
+    hide_player();   /* he is dead; do not leave him standing under the banner */
+
     if (lives > 0) {
         lives = lives - 1;
         enter_level();
@@ -212,6 +228,7 @@ void main(void) {
     pad_cur   = 0;
     pad_prev  = 0;
     pad_press = 0;
+    skip      = 0;
     score     = 0;
     frame     = 0;
     level     = 0;
@@ -231,6 +248,14 @@ void main(void) {
         frame = frame + 1;
         /* seed the RNG from how long the player took to press start */
         if (state == STATE_TITLE) rand_seed = rand_seed + 1;
+
+        /* Input is read ABOVE this line so pad_prev stays correct across the
+         * gap; then swallow the debounce frames.  Stops one A press walking
+         * through title -> game, or clear -> next level. */
+        if (skip > 0) {
+            skip = skip - 1;
+            continue;
+        }
 
         if (state == STATE_TITLE)       run_title();
         else if (state == STATE_SCORES) run_scores();

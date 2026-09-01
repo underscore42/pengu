@@ -23,6 +23,7 @@ void update_player(void);
 void update_slide(void);
 void update_crush(void);
 void draw_player(void);
+void hide_player(void);
 void draw_slide(void);
 void draw_crush(void);
 static void try_move(u8 d);
@@ -259,6 +260,16 @@ void update_crush(void) {
 }
 
 /* ---- drawing ---- */
+/* The blink in run_dead() ends on a DRAW frame (state_tmr hits 0 and 0 & 4
+ * is 0), and nothing cleared it afterwards - so the penguin sat on screen
+ * underneath the GAME OVER banner. */
+void hide_player(void) {
+    UnsetSprite(SPR_PENG);
+    UnsetSprite(SPR_PENG + 1);
+    UnsetSprite(SPR_PENG + 2);
+    UnsetSprite(SPR_PENG + 3);
+}
+
 void draw_player(void) {
     u8 base, f;
 

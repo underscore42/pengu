@@ -7,6 +7,7 @@ void update_player(void);
 void update_slide(void);
 void update_crush(void);
 void draw_player(void);
+void hide_player(void);
 void draw_slide(void);
 void draw_crush(void);
 

@@ -13,6 +13,7 @@ u8 grid[CELLS_H][CELLS_W];
 
 /* ---- global state ---- */
 u8  state, frame, paused;
+u8  skip;
 u16 score;
 u8  pad_cur, pad_prev, pad_press;
 u8  rand_seed;

@@ -98,6 +98,8 @@ extern u8 grid[CELLS_H][CELLS_W];
 
 /* ---- global state ---- */
 extern u8  state, frame, paused;
+extern u8  skip;    /* frames of input to swallow after a state change,
+                     * so one press cannot bleed through a transition */
 extern u16 score;
 extern u8  pad_cur, pad_prev, pad_press;
 extern u8  rand_seed;
