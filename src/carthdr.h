@@ -6,7 +6,7 @@ typedef void (*FuncPtr)(void);
 extern void main(void);
 const char Licensed[28]  = " LICENSED BY SNK CORPORATION";
 const FuncPtr ptr        = main;
-const short CartID       = 0x0052;
+const short CartID       = 0x0054;
 const short System       = 0x1000;      /* colour mode - byte at 0x23 */
 const char CartTitle[12] = "PENGU       ";
 const long Reserved[4]   = {0,0,0,0};

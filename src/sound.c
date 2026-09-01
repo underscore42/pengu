@@ -9,10 +9,10 @@
  *    exactly: two calls, back to back.
  * 2. sound_init() is called AFTER graphics setup in main().  Calling it
  *    first can also kill the driver.
- * 3. StopAllSounds() is declared in library.h but NOT exported by
- *    system.lib - calling it fails at tulink with unresolved external.
- *    gnu90 preflight cannot see this.  Never call it.  Silence comes from
- *    the volume decaying to 0, see 4.
+ * 3. The stop-all-sounds library call is declared in library.h but NOT
+ *    exported by system.lib - referencing it fails at tulink with an
+ *    unresolved external.  gnu90 preflight cannot see this.  Never call it.
+ *    Silence comes from the volume decaying to 0, see 4.
  * 4. There is no hardware envelope generator.  Volume is software-stepped
  *    and a channel HOLDS its last level forever, so every effect MUST reach
  *    volume 0 within its Length or the channel drones.  Every row below
@@ -27,7 +27,13 @@
  * 8. PlaySound(n) is 1-BASED: PlaySound(1) plays game_sounds[0], so the
  *    SND_* defines in sound.h run 1..11 and index this table directly.
  *
- * The array must NOT be const and must be explicitly sized for cc900.
+ * 9. The array MUST be const.  This is the one that made Pengu silent
+ *    through v1-v5: const data stays in ROM, but a non-const initialised
+ *    array needs a .data section copied ROM->RAM at startup, and it isn't.
+ *    game_sounds was the only non-const initialised table in the project -
+ *    every other table (tiles, maps, themes, kana) is const, which is
+ *    exactly why graphics worked and sound never did.  Explicitly sized as
+ *    well; the working example leaves it unsized, sizing is just defensive.
  *
  * Field order:
  *   Channel, Length, Repeat, InitialTone, ToneStep, ToneSpeed, ToneOWB,
@@ -36,7 +42,7 @@
  */
 #include "sound.h"
 
-static SOUNDEFFECT game_sounds[11] = {
+static const SOUNDEFFECT game_sounds[11] = {
 /*  1 push   */ { 1,  8, 0, 0x0180, 0x0030, 1, 0, 0x0120, 0x0300, 12, 2, 1, 0, 0, 15 },
 /*  2 crush  */ { 2, 14, 0, 0x0060, 0x0018, 1, 0, 0x0040, 0x0200, 15, 2, 1, 0, 0, 15 },
 /*  3 land   */ { 2,  8, 0, 0x0200, 0x0020, 1, 0, 0x0180, 0x0300, 11, 2, 1, 0, 0, 15 },
