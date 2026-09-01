@@ -130,10 +130,6 @@ used. Everything here was written from scratch for the NGPC.
 by, or connected to SEGA in any way. The name, artwork and all assets are
 original and deliberately distinct.
 
-**Free ROM only. No physical cartridges of this title are produced or sold.**
-That is a fixed rule for every homage under this label — the ROM is here to be
-played and studied, and it stops there.
-
 ---
 
 ## The Happy Meal Theory
